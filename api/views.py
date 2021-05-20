@@ -7,6 +7,12 @@ def get_location_by_name(name):
     """Return location instance by name"""
     pass
 
+def set_current_location(location):
+    pass
+
+def get_current_location(location):
+    pass
+
 def get_region_by_location(location):
     """Return region by location"""
     pass
@@ -15,8 +21,8 @@ def get_district_by_location(location):
     """Return district by location"""
     pass
 
-def get_settelments_in_radius(location, radius):
-    """Return all settelments in area 'radius' over location"""
+def get_settelments_in_radius(radius):
+    """Return all settelments in area 'radius' over current location"""
     pass
 
 

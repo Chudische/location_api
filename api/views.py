@@ -1,31 +1,12 @@
 import json
-from django.shortcuts import render
-from django.utils.translation import to_locale
+from rest_framework.decorators import api_view
 from django.http import JsonResponse
 
-
-def get_location_by_name(name):
-    """Return location instance by name"""
+@api_view(['GET',])
+def get_location_by_name(request):
+    """Return location by name"""
 #получить координаты по названию НП(населенный пункт)
-    pass
-
-def set_current_location(location):
-#это мне не понятно    
-    pass
-
-def get_current_location(location):
-#это мне не понятно    
-    pass
-
-def get_region_by_location(location):
-    """Return region by location"""
-#получить район по названию НП?
-    pass
-
-def get_district_by_location(location):
-    """Return district by location"""
-#получить район нп?
-    pass
+    
 
 def get_settelments_in_radius(radius):
     """Return all settelments in area 'radius' over current location"""

@@ -3,3 +3,5 @@ django-bootstrap4
 djangorestframework
 markdown
 django-filter
+python-dotenv
+django-import-export

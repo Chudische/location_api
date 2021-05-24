@@ -1,9 +1,9 @@
-from shabashka.main.models import Category
-from shabashka.main.views import index
-from django.db import models
+#from shabashka.main.models import Category #не используется
+#from shabashka.main.views import index #не используется
+from django.db.models import IntegerField, CharField, Model
+from django.contrib.gis.db.models import PointField
 
-
-class Place(models.Model):
+class Place(Model):
     CHOISES = [
         ('О', 'область'),
         ('Р', 'район'),
@@ -12,10 +12,11 @@ class Place(models.Model):
         ('С', 'село'),        
         ('Щ', 'селище'),
     ]
-    id = models.IntegerField(primary_key=True, verbose_name="Код")
-    parent_id = models.IntegerField(verbose_name="Родитель", db_index=True, null=True)
-    category = models.CharField(max_length=1, choices=CHOISES, verbose_name="Категория")
-    name = models.CharField(max_length=255, verbose_name="Название")
+    id = IntegerField(primary_key=True, verbose_name="Код")
+    parent_id = IntegerField(verbose_name="Родитель", db_index=True, null=True)
+    category = CharField(max_length=1, choices=CHOISES, verbose_name="Категория")
+    name = CharField(max_length=255, verbose_name="Название")
+    coordinates = PointField(verbose_name="Координаты")
 
     def __str__(self):
         return self.name

@@ -2,11 +2,19 @@
     <body>
         <form action='/api/get_name_by_id/'>
             <input name='id'>
-            <button type='submit' >Получить название населенного пункта по id</button>
+            <button type='submit'>Получить название населенного пункта по id</button>
         </form>
-        <!--
-            '/api/get_full_name_by_id/'
-            '/api/get_most_popular_localities_by_names_first_leters/'
-        -->
+         <form action='/api/get_full_name_by_id/'>
+            <input name='id'>
+            <button type='submit'>Получить полное название населенного пункта по id</button>
+        </form>
+	
+          <form action='/api/get_most_popular_localities_by_names_first_leters/'>
+            <input name='flname'>
+	    <input name='count'>
+            <button type='submit'>Получить названия НП по первым буквам</button>
+        </form>
+       
+       
     </body>
 </html>

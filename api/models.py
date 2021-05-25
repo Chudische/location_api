@@ -1,4 +1,4 @@
-from django.db.models import IntegerField, CharField, Model
+from django.db.models import IntegerField, CharField, Model, BooleanField
 from django.contrib.gis.db.models import PointField
 
 class Place(Model):
@@ -15,6 +15,9 @@ class Place(Model):
     category = CharField(max_length=1, choices=CHOISES, verbose_name="Категория")
     name = CharField(max_length=255, verbose_name="Название")
     coordinates = PointField(verbose_name="Координаты", null=True)
+    rating = IntegerField(default=0, verbose_name='Рейтинг')
+    is_active = BooleanField(default=True, verbose_name='Запись активна?')
+
     
 
     def __str__(self):
@@ -31,8 +34,29 @@ class Place(Model):
             print(parent_id)
         return full_name
 
+    def get_coordinates_from_post(self):
+        pass
 
     class Meta:
         verbose_name = 'Населенный пункт'
         verbose_name_plural = 'Населенные пункты'
- 
+
+class Post(Model):
+    region = CharField(max_length=255, verbose_name="Область")
+    area = CharField(max_length=255, verbose_name="Район")
+    place = CharField(max_length=255, verbose_name="Населенный пункт")
+    post_index = CharField(max_length=5, verbose_name="Индекс отделения")
+    street = CharField(max_length=255, verbose_name="Улица")
+    houses = CharField(max_length=2000, verbose_name="Дома")
+    #coordinates = PointField(null=True, verbose_name="Координаты") #или двумя параметрами широта долгота FloatField
+
+    def __str__(self):
+        return self.place
+
+    def import_from_csv():
+        #проще наверно import_export использовать, или можно свой сдесь написать
+        pass
+
+    class Meta:
+        verbose_name = 'База данных почты'
+        verbose_name_plural = 'База данных почты'

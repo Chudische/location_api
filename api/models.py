@@ -20,6 +20,18 @@ class Place(Model):
     def __str__(self):
         return self.name
 
+    def get_full_name(self):
+        full_name = self.category + ' ' + self.name
+        parent_id = self.parent_id
+        print(parent_id)
+        while parent_id:
+            parent = Place.objects.get(pk=parent_id)
+            full_name = parent.category + ' ' + parent.name + ' ' + full_name 
+            parent_id = parent.parent_id
+            print(parent_id)
+        return full_name
+
+
     class Meta:
         verbose_name = 'Населенный пункт'
         verbose_name_plural = 'Населенные пункты'

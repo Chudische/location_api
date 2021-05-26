@@ -1,11 +1,13 @@
 import json
 from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.status import HTTP_404_NOT_FOUND
 from rest_framework.response import Response
 from django.http import JsonResponse
 
 from .models import Place
+from .serializers import SearchFirstLetters
 
 @api_view(['GET'])
 def get_name_by_id(request):
@@ -31,8 +33,15 @@ def get_full_name_by_id(request):
     return Response(responce)
 
 
+@api_view(['GET'])
+def find_places(request):
+    search_key = request.GET.get('find', '')
+    query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper())
+    serializer = SearchFirstLetters(query, many=True)    
+    return Response(serializer.data)
+
 def get_most_popular_localities_by_names_first_leters(request):
-#получить НП (названия и id)  по первым буквам (можно в ответе разбивать на одласть район ...)
+    """ """
     responce = {}
     if request.method == 'GET' and request.GET:
         try:

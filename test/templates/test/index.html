@@ -8,11 +8,18 @@
             <input name='id'>
             <button type='submit'>Получить полное название населенного пункта по id</button>
         </form>
-	
-          <form action='/api/get_most_popular_localities_by_names_first_leters/'>
-            <input name='flname'>
-	    <input name='count'>
-            <button type='submit'>Получить названия НП по первым буквам</button>
+         <form action='/api/get_ids_by_name/'>
+            <input name='name'>
+            <button type='submit'>Получить id-шки по названию населенного пункта</button>
+        </form>
+         <form action='/api/get_full_names_by_name/'>
+            <input name='name'>
+            <button type='submit'>Получить полные названия по названию населенного пункта</button>
+        </form>
+        <form action='/api/get_most_popular_localities_by_names_first_leters/'>
+           <input name='flname'>
+	       <input name='count'>
+           <button type='submit'>Получить названия НП по первым буквам</button>
         </form>
        
        

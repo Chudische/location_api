@@ -30,6 +30,42 @@ def get_full_name_by_id(request):
     responce = {'full_name': place.get_full_name()}
     return Response(responce)
 
+@api_view(['GET'])
+def get_ids_by_name(request):
+    """Return id by name of place TODO: sort by raiting"""
+    try:
+        get_name = request.GET.get('name', '')
+        #text_name = get_name.text
+        upper_name = get_name.upper()
+        print(upper_name)
+        places = Place.objects.filter(name=upper_name)
+    except ObjectDoesNotExist:
+        return Response({'error': 'place with current name does not exist'}, HTTP_404_NOT_FOUND)           
+    responce = []
+    for place in places:
+        responce.append({'id': place.id})
+
+    print (responce)
+    return Response(responce)
+
+@api_view(['GET'])
+def get_full_names_by_name(request):
+    """Return full names by name of place TODO: sort by raiting"""
+    try:
+        get_name = request.GET.get('name', '')
+        #text_name = get_name.text
+        upper_name = get_name.upper()
+        print(upper_name)
+        places = Place.objects.filter(name=upper_name)
+    except ObjectDoesNotExist:
+        return Response({'error': 'place with current name does not exist'}, HTTP_404_NOT_FOUND)           
+    responce = []
+    for place in places:
+        responce.append({'full_name': place.get_full_name()})
+
+    print (responce)
+    return Response(responce)
+
 
 def get_most_popular_localities_by_names_first_leters(request):
 #получить НП (названия и id)  по первым буквам (можно в ответе разбивать на одласть район ...)

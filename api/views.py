@@ -1,6 +1,5 @@
 import json
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.status import HTTP_404_NOT_FOUND
 from rest_framework.response import Response
@@ -68,16 +67,16 @@ def get_full_names_by_name(request):
     print (responce)
     return Response(responce)
 
-<<<<<<< HEAD
 
 @api_view(['GET'])
 def find_places(request):
     search_key = request.GET.get('find', '')
     query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper())
-    serializer = SearchFirstLetters(query, many=True)    
-    return Response(serializer.data)
-=======
->>>>>>> 1d830c44ad48bdd7d9ab4b6040549bed98acf677
+    response = []
+    for place in query:
+        response.append({place.id: place.get_full_name()})
+    return Response(response)
+
 
 def get_most_popular_localities_by_names_first_leters(request):
     """ """

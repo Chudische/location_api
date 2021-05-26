@@ -69,13 +69,20 @@ def get_full_names_by_name(request):
 
 
 @api_view(['GET'])
-def find_places(request):
+def find_full_names(request):
     search_key = request.GET.get('find', '')
     query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper())
     response = []
     for place in query:
         response.append({place.id: place.get_full_name()})
     return Response(response)
+
+@api_view(['GET'])
+def find_names(request):
+    search_key = request.GET.get('find', '')
+    query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper())
+    serializer = SearchFirstLetters(query, many=True)
+    return Response(serializer.data)
 
 
 def get_most_popular_localities_by_names_first_leters(request):

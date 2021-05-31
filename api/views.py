@@ -74,7 +74,8 @@ def find_full_names(request):
     query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper())
     response = []
     for place in query:
-        response.append({place.id: place.get_full_name()})
+        response.append({'name': place.get_full_name(),
+                         'id': place.id})
     return Response(response)
 
 @api_view(['GET'])

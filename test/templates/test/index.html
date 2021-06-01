@@ -16,12 +16,15 @@
             <input name='name'>
             <button type='submit'>Получить полные названия по названию населенного пункта</button>
         </form>
-        <form action='/api/get_most_popular_localities_by_names_first_leters/'>
-           <input name='flname'>
+        <form action='/api/find_names'>
+           <input name='find'>
 	       <input name='count'>
            <button type='submit'>Получить названия НП по первым буквам</button>
         </form>
-       
-       
+        <form action='/api/find_full_names'>
+           <input name='find'>
+           <input name='count'>
+           <button type='submit'>Получить полные названия НП по первым буквам</button>
+        </form>
     </body>
 </html>

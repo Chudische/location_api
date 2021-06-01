@@ -71,7 +71,20 @@ def get_full_names_by_name(request):
 @api_view(['GET'])
 def find_full_names(request):
     search_key = request.GET.get('find', '')
-    query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper())
+    try:
+        if 'count' in request.GET:
+            count = int(request.GET['count'],16)
+        else:
+            count=8
+    except:
+        count=8
+
+    if count>30:
+        count=30
+    if count <=0:
+        count=1
+
+    query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper()).order_by('rating')[:count]
     response = []
     for place in query:
         response.append({'name': place.get_category_display() + place.name,
@@ -82,21 +95,35 @@ def find_full_names(request):
 @api_view(['GET'])
 def find_names(request):
     search_key = request.GET.get('find', '')
-    query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper())
+    try:
+        if 'count' in request.GET:
+            count = int(request.GET['count'],16)
+        else:
+            count=8
+    except:
+        count=8
+
+    if count>30:
+        count=30
+    if count <=0:
+        count=1
+
+    query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper()).order_by('rating')[:count]
     serializer = SearchFirstLetters(query, many=True)
     return Response(serializer.data)
 
 
-def get_most_popular_localities_by_names_first_leters(request):
-    """ """
-    responce = {}
-    if request.method == 'GET' and request.GET:
-        try:
-            if 'flname' in request.GET:
-                flname = request.GET['flname']#='ки'
-                count = int(request.GET['count'],16)
-                responce ={'0':{'id':12,'name':'Киев'},'1':{'id':52351, 'name':'Львовская обл. Стрийский р-н с.Киринеи,'},}#TODO сделать обращение к базе и получение названий колличество ограничить параметром count
-        except:
-                raise Http404("flname or count does not exist")            
+#def get_most_popular_localities_by_names_first_leters(request):
+
+    # """ """
+    # responce = {}
+    # if request.method == 'GET' and request.GET:
+    #     try:
+    #         if 'flname' in request.GET:
+    #             flname = request.GET['flname']#='ки'
+    #             count = int(request.GET['count'],16)
+    #             responce ={'0':{'id':12,'name':'Киев'},'1':{'id':52351, 'name':'Львовская обл. Стрийский р-н с.Киринеи,'},}#TODO сделать обращение к базе и получение названий колличество ограничить параметром count
+    #     except:
+    #             raise Http404("flname or count does not exist")            
     
-    return JsonResponse(json.dumps(responce, ensure_ascii=False, default=str), safe=False)
+    # return JsonResponse(json.dumps(responce, ensure_ascii=False, default=str), safe=False)

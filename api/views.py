@@ -72,18 +72,10 @@ def get_full_names_by_name(request):
 def find_full_names(request):
     search_key = request.GET.get('find', '')
     try:
-        if 'count' in request.GET:
-            count = int(request.GET['count'],16)
-        else:
-            count=8
-    except:
-        count=8
-
-    if count>30:
-        count=30
-    if count <=0:
-        count=1
-
+        count = int(request.Get.get('count', 8))
+    except ValueError:
+        count = 8
+    count = 30 if count > 30 or count < 0 else count
     query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper()).order_by('rating')[:count]
     response = []
     for place in query:
@@ -92,22 +84,15 @@ def find_full_names(request):
                          'id': place.id})
     return Response(response)
 
+
 @api_view(['GET'])
 def find_names(request):
     search_key = request.GET.get('find', '')
     try:
-        if 'count' in request.GET:
-            count = int(request.GET['count'],16)
-        else:
-            count=8
-    except:
-        count=8
-
-    if count>30:
-        count=30
-    if count <=0:
-        count=1
-
+        count = int(request.Get.get('count', 8))
+    except ValueError:
+        count = 8
+    count = 30 if count > 30 or count < 0 else count
     query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper()).order_by('rating')[:count]
     serializer = SearchFirstLetters(query, many=True)
     return Response(serializer.data)

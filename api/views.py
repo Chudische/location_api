@@ -16,7 +16,7 @@ def get_name_by_id(request):
     except ObjectDoesNotExist:
         return Response({'error': 'place with current id does not exist'}, HTTP_404_NOT_FOUND)
 
-    responce = {'name': place.name}    
+    responce = {'name': place.name}
     return Response(responce)
 
 
@@ -28,7 +28,7 @@ def get_full_name_by_id(request):
     except ObjectDoesNotExist:
         return Response({'error': 'place with current id does not exist'}, HTTP_404_NOT_FOUND)           
     
-    responce = {'full_name': place.get_full_name()}
+    responce = {'full_name': place.name + place.get_all_parents()}
     return Response(responce)
 
 @api_view(['GET'])
@@ -62,7 +62,7 @@ def get_full_names_by_name(request):
         return Response({'error': 'place with current name does not exist'}, HTTP_404_NOT_FOUND)           
     responce = []
     for place in places:
-        responce.append({'full_name': place.get_full_name()})
+        responce.append({'full_name': place.name + place.get_all_parents()})
 
     print (responce)
     return Response(responce)
@@ -75,7 +75,7 @@ def find_full_names(request):
     response = []
     for place in query:
         response.append({'name': place.get_category_display() + place.name,
-                         'full_name': place.get_full_name(),
+                         'full_name': place.get_all_parents(),
                          'id': place.id})
     return Response(response)
 
@@ -88,17 +88,3 @@ def find_names(request):
     return Response(serializer.data)
 
 
-#def get_most_popular_localities_by_names_first_leters(request):
-
-    # """ """
-    # responce = {}
-    # if request.method == 'GET' and request.GET:
-    #     try:
-    #         if 'flname' in request.GET:
-    #             flname = request.GET['flname']#='ки'
-    #             count = int(request.GET['count'],16)
-    #             responce ={'0':{'id':12,'name':'Киев'},'1':{'id':52351, 'name':'Львовская обл. Стрийский р-н с.Киринеи,'},}#TODO сделать обращение к базе и получение названий колличество ограничить параметром count
-    #     except:
-    #             raise Http404("flname or count does not exist")            
-    
-    # return JsonResponse(json.dumps(responce, ensure_ascii=False, default=str), safe=False)

@@ -22,14 +22,14 @@ class Place(Model):
     def __str__(self):
         return self.name
 
-    def get_full_name(self):
-        full_name = ''
+    def get_all_parents(self):
+        all_parents = ''
         parent_id = self.parent_id       
         while parent_id:
             parent = Place.objects.get(pk=parent_id)
-            full_name += ' ' + parent.name
+            all_parents += ' ' + parent.name
             parent_id = parent.parent_id            
-        return full_name
+        return all_parents
 
     def get_coordinates_from_post(self):
         pass

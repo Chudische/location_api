@@ -12,15 +12,21 @@ class Place(Model):
         ('Щ', 'с. '),
     ]
     id = IntegerField(primary_key=True, verbose_name="Код")
-    parent_id = IntegerField(verbose_name="Родитель", db_index=True, null=True)
-    category = CharField(max_length=1, choices=CHOISES, verbose_name="Категория")
+    parent_id = IntegerField(verbose_name="Родитель", db_index=True, null=True, blank=True,)
+    category = CharField(max_length=1, choices=CHOISES, null=True, blank=True, verbose_name="Категория")
     name = CharField(max_length=255, verbose_name="Название")
-    coordinates = PointField(verbose_name="Координаты", null=True)
+    coordinates = PointField(verbose_name="Координаты", null=True, blank=True)
     rating = IntegerField(default=0, verbose_name='Рейтинг')
+    is_location = BooleanField(default=True, verbose_name='Это НП?')
     is_active = BooleanField(default=True, verbose_name='Запись активна?')
 
     def __str__(self):
-        return self.name
+        name = self.name.capitalize()
+        if name.endswith("район"):
+            name = name.replace("район","р-н")
+        if name.endswith("область"):
+            name = name.replace("область","об.")
+        return name
 
     def get_all_parents(self):
         all_parents = ''
@@ -31,8 +37,49 @@ class Place(Model):
             parent_id = parent.parent_id            
         return all_parents
 
-    def get_coordinates_from_post(self):
-        pass
+    def get_parents_id(self):
+        all_parents = []
+        parent_id = self.parent_id       
+        while parent_id:
+            all_parents.append(parent_id)
+            parent = Place.objects.get(pk=parent_id)
+            parent_id = parent.parent_id            
+        return all_parents
+
+    def get_affiliations(self):
+        region = 0
+        area = 0
+        parent_id = self.parent_id       
+        while parent_id:
+            parent = Place.objects.get(pk=parent_id)
+            #if parent.category == 'Р':
+            #    area=parent.id
+            if "РАЙОН" in parent.name:
+                area = parent.id
+                #print("area:",area)
+            if parent.category == 'О':
+                region = parent.id
+            parent_id = parent.parent_id            
+
+        return {'region':region,'area':area,}
+    
+    def get_name_with_affiliations(self):
+        affil = self.get_affiliations()
+        try:
+            area = str(Place.objects.get(pk=affil['area']))
+        except:
+            area=""
+        try:
+            region = str(Place.objects.get(pk=affil['region']))
+        except:
+            region=""
+
+        full_name = {
+            'name':str(self),
+            'area':area,
+            'region':region,
+        }
+        return full_name
 
     class Meta:
         verbose_name = 'Населенный пункт'

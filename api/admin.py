@@ -11,7 +11,7 @@ class PlaceResource(resources.ModelResource):
 
 class PlaceAdmin(ImportExportModelAdmin):
     resource_class = PlaceResource
-    list_display = ('id', 'parent_id', 'category', 'name', '__str__','is_location')
+    list_display = ('id', 'parent_id', 'category', 'name', 'is_location', 'full_name_is')
     search_fields = ( 'id','name')
     list_filter = ('is_location',)
 

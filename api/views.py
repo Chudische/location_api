@@ -107,6 +107,23 @@ def get_name_with_affiliations_by_id(request):
     responce = place.get_name_with_affilations()
     return Response(responce)
 
+@api_view(['GET'])
+def get_all_places_ids_in_location_area_by_id(request):
+    place = Place.objects.get(pk=request.GET.get('id', ''))
+    affil = place.get_affiliations()
+    area = Place.objects.get(pk=affil['area'])
+    childs_id = area.get_all_childs()
+    responce = childs_id
+    # for location in childs_area:
+    #     childs_location = location.get_childs()
+    #     if childs_location:
+    #         for
+    #     else:
+    #     responce.append({'id':location.id, 'name':str(location)})
+    return Response(responce)
+
+
+
 
 def all_locations_with_full_name(request):
     all_locations = Place.objects.filter(is_location=True)

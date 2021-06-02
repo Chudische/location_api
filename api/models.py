@@ -24,8 +24,16 @@ class Place(Model):
         name = self.name.capitalize()
         if name.endswith("район"):
             name = name.replace("район","р-н")
+
         if name.endswith("область"):
             name = name.replace("область","об.")
+        if self.category == 'С' or self.category == 'Щ':
+            name = 'c.' + name
+        if self.category == 'М':
+            name = 'м.' + name
+        if self.category == 'Т':
+            name = 'смт.' + name
+
         return name
 
     def get_all_parents(self):
@@ -56,7 +64,8 @@ class Place(Model):
             #    area=parent.id
             if "РАЙОН" in parent.name:
                 area = parent.id
-                #print("area:",area)
+            # if parent.category == 'Р':
+            #     area = parent.id
             if parent.category == 'О':
                 region = parent.id
             parent_id = parent.parent_id            
@@ -80,6 +89,24 @@ class Place(Model):
             'region':region,
         }
         return full_name
+
+    def full_name_is(self):
+        nwa = self.get_name_with_affiliations()
+        return nwa['name'] + " " + nwa['area'] + ' ' + nwa['region'] 
+
+    def get_childs(self):
+        return Place.objects.filter(parent_id=self.id)
+
+    def get_all_childs(self):#TODO:set a maximum deep
+        childs_id=[]
+        childs = self.get_childs()
+        for child in childs:
+            if not child.get_childs():
+                if child.is_location:
+                    childs_id.append({'id':child.id,'name':str(child),})
+            else:
+                childs_id.extend(child.get_all_childs())
+        return childs_id
 
     class Meta:
         verbose_name = 'Населенный пункт'

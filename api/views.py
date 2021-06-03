@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import api_view
 from rest_framework.status import HTTP_404_NOT_FOUND
 from rest_framework.response import Response
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 
 from .models import Place
 from .serializers import SearchFirstLetters
@@ -16,7 +16,8 @@ def get_name_by_id(request):
     except ObjectDoesNotExist:
         return Response({'error': 'place with current id does not exist'}, HTTP_404_NOT_FOUND)
 
-    responce = {'name': place.name}
+    print(place.category)
+    responce = {'name': place.name}    
     return Response(responce)
 
 
@@ -87,4 +88,68 @@ def find_names(request):
     serializer = SearchFirstLetters(query, many=True)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def get_parents_id(request):
+    place = Place.objects.get(pk=request.GET.get('id', ''))
+    responce = place.get_parents_id()
+    return Response(responce)
 
+
+@api_view(['GET'])
+def get_affiliations_ids_by_id(request):
+    place = Place.objects.get(pk=request.GET.get('id', ''))
+    responce = place.get_affiliations()
+    return Response(responce)
+
+@api_view(['GET'])
+def get_name_with_affiliations_by_id(request):
+    place = Place.objects.get(pk=request.GET.get('id', ''))
+    responce = place.get_name_with_affilations()
+    return Response(responce)
+
+@api_view(['GET'])
+def get_all_places_ids_in_location_area_by_id(request):
+    place = Place.objects.get(pk=request.GET.get('id', ''))
+    affil = place.get_affiliations()
+    area = Place.objects.get(pk=affil['area'])
+    childs_id = area.get_all_childs()
+    responce = childs_id
+    # for location in childs_area:
+    #     childs_location = location.get_childs()
+    #     if childs_location:
+    #         for
+    #     else:
+    #     responce.append({'id':location.id, 'name':str(location)})
+    return Response(responce)
+
+
+
+
+def all_locations_with_full_name(request):
+    all_locations = Place.objects.filter(is_location=True)
+    response = '<html><body><h1>Все населенные пункты</h1>'
+    for location in all_locations:
+        affil = location.get_name_with_affiliations()
+        response += "<span>" + str(location.id) +"</span> <b>" + str(location) + "</b> " + affil['area'] + " <i>" + affil['region'] + "</i><br>" 
+    response += "<h1>The end</h1></body></html>"
+    return HttpResponse(response)
+
+def all_locations_without_area(request):
+    all_locations = Place.objects.filter(is_location=True)
+    response = '<html><body><h1>Все населенные пункты без районов</h1>'
+    for location in all_locations:
+        affil = location.get_affiliations()
+        if not affil['area']:
+            response += "<span>id:" + str(location.id) +"</span> name:<b>" + str(location) + "</b> is null area:" + str(affil['area']) + " <i>region:" + str(affil['region']) + "</i><br>" 
+    response += "<h1>The end</h1></body></html>"
+    return HttpResponse(response)
+
+def all_locations_without_region(request):
+    all_locations = Place.objects.filter(is_location=True)
+    response = '<html><body><h1>Все населенные пункты без районов</h1>'
+    for location in all_locations:
+        affil = location.get_affiliations()
+        if not affil['region']:
+            response += "<span>id:" + str(location.id) +"</span> name:<b>" + str(location) + "</b>area:" + str(affil['area']) + " <i>region is null:" + str(affil['region']) + "</i><br>" 
+    response += "<h1>The end</h1></body></html>"
+    return HttpResponse(response)

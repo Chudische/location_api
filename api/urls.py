@@ -17,5 +17,7 @@ urlpatterns = [
 	path('all_locations_with_full_name/', views.all_locations_with_full_name, name='all_locations_with_full_name'),
 	path('all_locations_without_area/', views.all_locations_without_area, name='all_locations_without_area'),
 	path('all_locations_without_region/', views.all_locations_without_region, name='all_locations_without_region'),
+	path('all_locations_have_child/', views.all_locations_have_child, name='all_locations_have_child'),
+	
 ]
 

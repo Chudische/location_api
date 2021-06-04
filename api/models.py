@@ -70,29 +70,29 @@ class Place(Model):
                 region = parent.id
             parent_id = parent.parent_id            
 
-        return {'region':region,'area':area,}
+        return {'region': region, 'area': area}
     
     def get_name_with_affiliations(self):
         affil = self.get_affiliations()
         try:
             area = str(Place.objects.get(pk=affil['area']))
         except:
-            area=""
+            area = ""
         try:
             region = str(Place.objects.get(pk=affil['region']))
         except:
-            region=""
+            region = ""
 
         full_name = {
-            'name':str(self),
-            'area':area,
-            'region':region,
+            'name': str(self),
+            'area': area,
+            'region': region,
         }
         return full_name
 
     def full_name_is(self):
         nwa = self.get_name_with_affiliations()
-        return nwa['name'] + " " + nwa['area'] + ' ' + nwa['region'] 
+        return nwa['name'] + ' ' + nwa['area'] + ' ' + nwa['region']
 
     def get_childs(self):
         return Place.objects.filter(parent_id=self.id)
@@ -103,7 +103,7 @@ class Place(Model):
         for child in childs:
             if not child.get_childs():
                 if child.is_location:
-                    childs_id.append({'id':child.id,'name':str(child),})
+                    childs_id.append({'id': child.id, 'name': str(child)})
             else:
                 childs_id.extend(child.get_all_childs())
         return childs_id

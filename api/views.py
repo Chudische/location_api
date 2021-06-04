@@ -29,7 +29,7 @@ def get_full_name_by_id(request):
     except ObjectDoesNotExist:
         return Response({'error': 'place with current id does not exist'}, HTTP_404_NOT_FOUND)           
     
-    responce = {'full_name': place.name + place.get_all_parents()}
+    responce = {'full_name': str(place) + place.get_all_parents()}
     return Response(responce)
 
 @api_view(['GET'])
@@ -46,8 +46,6 @@ def get_ids_by_name(request):
     responce = []
     for place in places:
         responce.append({'id': place.id})
-
-    print (responce)
     return Response(responce)
 
 @api_view(['GET'])
@@ -64,8 +62,6 @@ def get_full_names_by_name(request):
     responce = []
     for place in places:
         responce.append({'full_name': place.name + place.get_all_parents()})
-
-    print (responce)
     return Response(responce)
 
 
@@ -75,7 +71,7 @@ def find_full_names(request):
     query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper()).order_by('rating')
     response = []
     for place in query:
-        response.append({'name': place.get_category_display() + place.name,
+        response.append({'name': str(place),
                          'full_name': place.get_all_parents(),
                          'id': place.id})
     return Response(response)

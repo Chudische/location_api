@@ -118,15 +118,12 @@ def get_all_places_ids_in_location_area_by_id(request):
     #     responce.append({'id':location.id, 'name':str(location)})
     return Response(responce)
 
-
-
-
 def all_locations_with_full_name(request):
     all_locations = Place.objects.filter(is_location=True)
     response = '<html><body><h1>Все населенные пункты</h1>'
     for location in all_locations:
         affil = location.get_name_with_affiliations()
-        response += "<span>" + str(location.id) +"</span> <b>" + str(location) + "</b> " + affil['area'] + " <i>" + affil['region'] + "</i><br>" 
+        response += "<span>" + str(location.id) +"</span> <b>" + str(location) + "</b> " + affil['area'] + " <i>" + affil['region'] + "</i><br>\n" 
     response += "<h1>The end</h1></body></html>"
     return HttpResponse(response)
 
@@ -136,7 +133,7 @@ def all_locations_without_area(request):
     for location in all_locations:
         affil = location.get_affiliations()
         if not affil['area']:
-            response += "<span>id:" + str(location.id) +"</span> name:<b>" + str(location) + "</b> is null area:" + str(affil['area']) + " <i>region:" + str(affil['region']) + "</i><br>" 
+            response += "<span>id:" + str(location.id) +"</span> name:<b>" + str(location) + "</b> is null area:" + str(affil['area']) + " <i>region:" + str(affil['region']) + "</i><br>\n" 
     response += "<h1>The end</h1></body></html>"
     return HttpResponse(response)
 
@@ -146,6 +143,24 @@ def all_locations_without_region(request):
     for location in all_locations:
         affil = location.get_affiliations()
         if not affil['region']:
-            response += "<span>id:" + str(location.id) +"</span> name:<b>" + str(location) + "</b>area:" + str(affil['area']) + " <i>region is null:" + str(affil['region']) + "</i><br>" 
+            response += "<span>id:" + str(location.id) +"</span> name:<b>" + str(location) + "</b>area:" + str(affil['area']) + " <i>region is null:" + str(affil['region']) + "</i><br>\n" 
+    response += "<h1>The end</h1></body></html>"
+    return HttpResponse(response)
+
+def all_locations_have_child(request):
+    all_locations = Place.objects.all()
+    response = '<html><body><h1>Все локации имеющие наследников</h1>'
+    for location in all_locations:
+        if location.get_childs():
+            affil = location.get_name_with_affiliations()
+            if location.is_location:
+                status = '<font color=red>Это НП.</font>'
+            else:
+                status = '<font color=green>Это не НП.</font>'
+            response += "<span>" + str(location.id) +"</span> <b>" + str(location) + "</b> " + affil['area'] + " <i>" + affil['region'] + "</i> " + status + " <br>\n" 
+            print (location.id)
+            # if location.is_location:
+            #     location.is_location = False
+            #     location.save()
     response += "<h1>The end</h1></body></html>"
     return HttpResponse(response)

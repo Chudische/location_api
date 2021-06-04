@@ -4,8 +4,8 @@ from django.contrib.gis.db.models import PointField
 
 class Place(Model):
     CHOISES = [
-        ('О', 'ОБЛАСТЬ '),
-        ('Р', 'РАЙОН '),
+        ('О', 'обл. '),
+        ('Р', 'р-н '),
         ('М', 'м. '),
         ('Т', 'смт. '),
         ('С', 'с. '),
@@ -24,35 +24,22 @@ class Place(Model):
         name = self.name.capitalize()
         if name.endswith("район"):
             name = name.replace("район", "р-н")
-
-        if name.endswith("область"):
-            name = name.replace("область", "об.")
-        if self.category == 'С' or self.category == 'Щ':
-            name = 'c.' + name
-        if self.category == 'М':
-            name = 'м.' + name
-        if self.category == 'Т':
-            name = 'смт.' + name
-
+        elif name.endswith("область"):
+            name = name.replace("область", "обл.")
+        elif self.category == 'О' and 'крим' in name:
+            name = ' '.join([word.capitalize() for word in name.split()])
+        elif self.get_category_display():
+            name = self.get_category_display() + name
         return name
 
-    def get_all_parents(self):
-        all_parents = ''
-        parent_id = self.parent_id       
-        while parent_id:
-            parent = Place.objects.get(pk=parent_id)
-            all_parents += ' ' + parent.name
-            parent_id = parent.parent_id            
-        return all_parents
-
-    def get_parents_id(self):
+    def all_parents(self):
         all_parents = []
         parent_id = self.parent_id       
         while parent_id:
-            all_parents.append(parent_id)
             parent = Place.objects.get(pk=parent_id)
+            all_parents.append(str(parent))
             parent_id = parent.parent_id            
-        return all_parents
+        return ' '.join(all_parents)
 
     def get_affiliations(self):
         region = 0
@@ -86,7 +73,7 @@ class Place(Model):
         }
         return full_name
 
-    def full_name_is(self):
+    def full_name(self):
         nwa = self.get_name_with_affiliations()
         return nwa['name'] + ' ' + nwa['area'] + ' ' + nwa['region']
 

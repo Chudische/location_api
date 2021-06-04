@@ -112,7 +112,16 @@ class Place(Model):
                 if location.category in ('М', 'Т', 'С', 'Щ'):
                     location.is_location = True
                     location.save()
-        return True
+
+    @staticmethod
+    def set_region_category():
+        all_locations = Place.objects.all()
+        for location in all_locations:
+            if "РАЙОН" in location.name:
+                parent = Place.objects.get(pk=location.parent_id)
+                if parent.category == 'О':
+                    location.category = 'Г'
+                    location.save()
 
     class Meta:
         verbose_name = 'Населенный пункт'

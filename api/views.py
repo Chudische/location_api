@@ -108,7 +108,7 @@ def get_all_places_ids_in_location_area_by_id(request):
     place = Place.objects.get(pk=request.GET.get('id', ''))
     affil = place.get_affiliations()
     area = Place.objects.get(pk=affil['area'])
-    childs_id = area.get_all_childs()
+    childs_id = area.get_all_children()
     responce = childs_id
     # for location in childs_area:
     #     childs_location = location.get_childs()
@@ -151,7 +151,7 @@ def all_locations_have_child(request):
     all_locations = Place.objects.all()
     response = '<html><body><h1>Все локации имеющие наследников</h1>'
     for location in all_locations:
-        if location.get_childs():
+        if location.get_children():
             affil = location.get_name_with_affiliations()
             if location.is_location:
                 status = '<font color=red>Это НП.</font>'

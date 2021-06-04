@@ -108,6 +108,23 @@ class Place(Model):
                 childs_id.extend(child.get_all_childs())
         return childs_id
 
+    def correct_db(self):
+        all_locations = Place.objects.all()
+        for location in all_locations:
+            # if location.get_childs():
+            #     affil = location.get_name_with_affiliations()
+            #     print (location.id)
+            #     if location.is_location:
+            #         location.is_location = False
+            #         location.save()
+            if not location.is_location:
+                if location.category in ('М','Т','С','Щ'):
+                    location.is_location = True
+                    location.save()
+                    #print (str(location))
+        return True
+
+
     class Meta:
         verbose_name = 'Населенный пункт'
         verbose_name_plural = 'Населенные пункты'

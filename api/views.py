@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from django.http import JsonResponse, HttpResponse
 
 from .models import Place
-from .serializers import SearchFirstLetters
+from .serializers import PlaceIdName, PlaceFullName, PlaceAllParents
+
 
 @api_view(['GET'])
 def get_name_by_id(request):
@@ -15,10 +16,8 @@ def get_name_by_id(request):
         place = Place.objects.get(pk=request.GET.get('id', ''))
     except ObjectDoesNotExist:
         return Response({'error': 'place with current id does not exist'}, HTTP_404_NOT_FOUND)
-
-    print(place.category)
-    responce = {'name': place.name}    
-    return Response(responce)
+    serializer = PlaceIdName(place)
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -27,10 +26,9 @@ def get_full_name_by_id(request):
     try:       
         place = Place.objects.get(pk=request.GET.get('id', ''))
     except ObjectDoesNotExist:
-        return Response({'error': 'place with current id does not exist'}, HTTP_404_NOT_FOUND)           
-    
-    responce = {'full_name': place.name + place.get_all_parents()}
-    return Response(responce)
+        return Response({'error': 'place with current id does not exist'}, HTTP_404_NOT_FOUND)
+    serializer = PlaceFullName(place)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def get_ids_by_name(request):
@@ -46,8 +44,6 @@ def get_ids_by_name(request):
     responce = []
     for place in places:
         responce.append({'id': place.id})
-
-    print (responce)
     return Response(responce)
 
 @api_view(['GET'])
@@ -63,36 +59,30 @@ def get_full_names_by_name(request):
         return Response({'error': 'place with current name does not exist'}, HTTP_404_NOT_FOUND)           
     responce = []
     for place in places:
-        responce.append({'full_name': place.name + place.get_all_parents()})
-
-    print (responce)
+        responce.append({'full_name': place.full_name()})
     return Response(responce)
 
 
 @api_view(['GET'])
 def find_full_names(request):
     search_key = request.GET.get('find', '')
-    query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper()).order_by('rating')
-    response = []
-    for place in query:
-        response.append({'name': place.get_category_display() + place.name,
-                         'full_name': place.get_all_parents(),
-                         'id': place.id})
-    return Response(response)
+    query = Place.objects.filter(is_location=True, name__startswith=search_key.upper()).order_by('rating')
+    serializer = PlaceFullName(query, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
 def find_names(request):
     search_key = request.GET.get('find', '')
-    query = Place.objects.filter(category__isnull=False, name__startswith=search_key.upper()).order_by('rating')
-    serializer = SearchFirstLetters(query, many=True)
+    places = Place.objects.filter(is_location=True, name__startswith=search_key.upper()).order_by('rating')
+    serializer = PlaceIdName(places, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
-def get_parents_id(request):
+def get_parents(request):
     place = Place.objects.get(pk=request.GET.get('id', ''))
-    responce = place.get_parents_id()
-    return Response(responce)
+    serializer = PlaceAllParents(place)
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -112,7 +102,7 @@ def get_all_places_ids_in_location_area_by_id(request):
     place = Place.objects.get(pk=request.GET.get('id', ''))
     affil = place.get_affiliations()
     area = Place.objects.get(pk=affil['area'])
-    childs_id = area.get_all_childs()
+    childs_id = area.get_all_children()
     responce = childs_id
     # for location in childs_area:
     #     childs_location = location.get_childs()
@@ -155,7 +145,7 @@ def all_locations_have_child(request):
     all_locations = Place.objects.all()
     response = '<html><body><h1>Все локации имеющие наследников</h1>'
     for location in all_locations:
-        if location.get_childs():
+        if location.get_children():
             affil = location.get_name_with_affiliations()
             if location.is_location:
                 status = '<font color=red>Это НП.</font>'

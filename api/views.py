@@ -94,7 +94,7 @@ def get_affiliations_ids_by_id(request):
 @api_view(['GET'])
 def get_name_with_affiliations_by_id(request):
     place = Place.objects.get(pk=request.GET.get('id', ''))
-    responce = place.get_name_with_affilations()
+    responce = place.get_name_with_affiliations()
     return Response(responce)
 
 @api_view(['GET'])

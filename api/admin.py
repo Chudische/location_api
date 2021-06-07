@@ -8,7 +8,7 @@ from .models import Place
 class PlaceResource(resources.ModelResource):
     class Meta:
         model = Place
-        fields = ('id', 'parent_id', 'category', 'name')
+        fields = ('id', 'parent_id', 'category', 'name', 'coordinates', 'rating', 'is_location', 'is_active')
 
 
 class PlaceAdmin(ImportExportModelAdmin):

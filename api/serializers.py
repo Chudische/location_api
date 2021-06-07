@@ -18,9 +18,9 @@ class PlaceFullName(serializers.ModelSerializer):
 
 
 class PlaceAllParents(serializers.ModelSerializer):
-    all_parents = serializers.CharField()
+    all_parents_name = serializers.CharField()
     name = serializers.CharField(source='__str__')
 
     class Meta:
         model = Place
-        fields = ('id', 'name', 'all_parents')
+        fields = ('id', 'name', 'all_parents_name')

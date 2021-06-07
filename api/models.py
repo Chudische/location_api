@@ -5,7 +5,8 @@ from django.contrib.gis.db.models import PointField
 class Place(Model):
     CHOISES = [
         ('О', 'обл. '),
-        ('Р', 'р-н '),
+        ('РГ', 'р-н '),
+        ('РН', 'р-н '),
         ('М', 'м. '),
         ('Т', 'смт. '),
         ('С', 'с. '),
@@ -13,11 +14,11 @@ class Place(Model):
     ]
     id = IntegerField(primary_key=True, verbose_name="Код")
     parent_id = IntegerField(verbose_name="Родитель", db_index=True, null=True, blank=True,)
-    category = CharField(max_length=1, choices=CHOISES, null=True, blank=True, verbose_name="Категория")
+    category = CharField(max_length=2, choices=CHOISES, null=True, blank=True, verbose_name="Категория")
     name = CharField(max_length=255, verbose_name="Название")
     coordinates = PointField(verbose_name="Координаты", null=True, blank=True)
     rating = IntegerField(default=0, verbose_name='Рейтинг')
-    is_location = BooleanField(default=True, verbose_name='Это НП?')
+    is_location = BooleanField(default=False, verbose_name='Это НП?')
     is_active = BooleanField(default=True, verbose_name='Запись активна?')
 
     def __str__(self):
@@ -26,8 +27,10 @@ class Place(Model):
             name = name.replace("район", "р-н")
         elif name.endswith("область"):
             name = name.replace("область", "обл.")
-        elif self.category == 'О' and 'крим' in name:
+        elif ' ' in name:
             name = ' '.join([word.capitalize() for word in name.split()])
+        elif '-' in self.name:
+            name = '-'.join([word.capitalize() for word in name.split('-')])
         elif self.get_category_display():
             name = self.get_category_display() + name
         return name
@@ -37,9 +40,12 @@ class Place(Model):
         parent_id = self.parent_id       
         while parent_id:
             parent = Place.objects.get(pk=parent_id)
-            all_parents.append(str(parent))
+            all_parents.append(parent)
             parent_id = parent.parent_id            
-        return ' '.join(all_parents)
+        return all_parents
+
+    def all_parents_name(self):
+        return ' '.join(str(name) for name in self.all_parents())
 
     def get_affiliations(self):
         region = 0
@@ -90,25 +96,6 @@ class Place(Model):
             else:
                 children_id.extend(child.get_all_children())
         return children_id
-
-    @staticmethod
-    def set_is_location_flag():
-        all_locations = Place.objects.all()
-        for location in all_locations:
-            if not location.is_location:
-                if location.category in ('М', 'Т', 'С', 'Щ'):
-                    location.is_location = True
-                    location.save()
-
-    @staticmethod
-    def set_region_category():
-        all_locations = Place.objects.all()
-        for location in all_locations:
-            if "РАЙОН" in location.name:
-                parent = Place.objects.get(pk=location.parent_id)
-                if parent.category == 'О':
-                    location.category = 'Г'
-                    location.save()
 
     class Meta:
         verbose_name = 'Населенный пункт'

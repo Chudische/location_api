@@ -10,7 +10,8 @@ class PlaceIdName(serializers.ModelSerializer):
 
 
 class PlaceFullName(serializers.ModelSerializer):
-    full_name = serializers.CharField()
+    name = serializers.CharField(source='__str__')
+    full_name = serializers.CharField(source='all_parents_name')
 
     class Meta:
         model = Place

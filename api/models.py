@@ -4,9 +4,9 @@ from django.contrib.gis.db.models import PointField
 
 class Place(Model):
     CHOISES = [
-        ('О', 'обл. '),
-        ('РГ', 'р-н '),
-        ('РН', 'р-н '),
+        ('О', ' обл.'),
+        ('РГ', ' р-н'),  # city district
+        ('РН', ' р-н'),  # region district
         ('М', 'м. '),
         ('Т', 'смт. '),
         ('С', 'с. '),
@@ -32,7 +32,10 @@ class Place(Model):
         elif '-' in self.name:
             name = '-'.join([word.capitalize() for word in name.split('-')])
         elif self.get_category_display():
-            name = self.get_category_display() + name
+            if self.category in ('О', 'РН', 'РГ'):
+                name = name + self.get_category_display()
+            else:
+                name = self.get_category_display() + name
         return name
 
     def all_parents(self):
@@ -47,47 +50,29 @@ class Place(Model):
     def all_parents_name(self):
         return ' '.join(str(name) for name in self.all_parents())
 
-    def get_affiliations(self):
-        region = 0
-        area = 0
-        parent_id = self.parent_id       
-        while parent_id:
-            parent = Place.objects.get(pk=parent_id)
-            if "РАЙОН" in parent.name:
-                area = parent.id
-            if parent.category == 'О':
-                region = parent.id
-            parent_id = parent.parent_id            
-
-        return {'region': region, 'area': area}
-    
-    def get_name_with_affiliations(self):
-        affil = self.get_affiliations()
-        try:
-            area = str(Place.objects.get(pk=affil['area']))
-        except:
-            area = ""
-        try:
-            region = str(Place.objects.get(pk=affil['region']))
-        except:
-            region = ""
-
-        full_name = {
-            'name': str(self),
-            'area': area,
-            'region': region,
-        }
-        return full_name
+    def get_region_and_district(self):
+        response = {'region': '', 'district': ''}
+        for place in self.all_parents():
+            if place.category == 'О':
+                response['region'] = place
+            elif place.category in ('РН', 'РГ'):
+                response['district'] = place
+        return response
 
     def full_name(self):
-        nwa = self.get_name_with_affiliations()
-        return nwa['name'] + ' ' + nwa['area'] + ' ' + nwa['region']
+        additional = self.get_region_and_district()
+        if any((additional.get('district', None), additional.get('region', None))):
+            return ' '.join(str(name) for name in (self, additional['district'], additional['region']))
+        return self.name_with_all_parents()
+
+    def name_with_all_parents(self):
+        return str(self) + ' ' + self.all_parents_name()
 
     def get_children(self):
         return Place.objects.filter(parent_id=self.id)
 
-    def get_all_children(self):#TODO:set a maximum deep
-        children_id=[]
+    def get_all_children(self):  # TODO:set a maximum deep
+        children_id = []
         children = self.get_children()
         for child in children:
             if not child.get_children():

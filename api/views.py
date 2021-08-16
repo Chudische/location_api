@@ -111,7 +111,7 @@ def get_all_places_ids_in_location_area_by_id(request):
     #     else:
     #     responce.append({'id':location.id, 'name':str(location)})
     return Response(responce)
-
+@login_required
 def all_locations_with_full_name(request):
     all_locations = Place.objects.filter(is_location=True)
     response = '<html><body><h1>Все населенные пункты</h1>'
@@ -121,6 +121,7 @@ def all_locations_with_full_name(request):
     response += "<h1>The end</h1></body></html>"
     return HttpResponse(response)
 
+@login_required
 def all_locations_without_area(request):
     all_locations = Place.objects.filter(is_location=True)
     response = '<html><body><h1>Все населенные пункты без районов</h1>'
@@ -131,6 +132,7 @@ def all_locations_without_area(request):
     response += "<h1>The end</h1></body></html>"
     return HttpResponse(response)
 
+@login_required
 def all_locations_without_region(request):
     all_locations = Place.objects.filter(is_location=True)
     response = '<html><body><h1>Все населенные пункты без районов</h1>'
@@ -141,6 +143,7 @@ def all_locations_without_region(request):
     response += "<h1>The end</h1></body></html>"
     return HttpResponse(response)
 
+@login_required
 def all_locations_have_child(request):
     all_locations = Place.objects.all()
     response = '<html><body><h1>Все локации имеющие наследников</h1>'
